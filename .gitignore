@@ -1,2 +1,4 @@
 darkstar
 certs
+*.key
+*.pem
