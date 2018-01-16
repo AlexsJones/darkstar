@@ -7,6 +7,5 @@ Command and control program in golang
 - Arbitrary code execution (WIP)
 
 ## Usage
-`./generate_certs.sh`
-
-`darkstar -mode=client`
+`darkstar #server mode`
+`darkstar -mode=client -serverhostaddress=0.0.0.0`
