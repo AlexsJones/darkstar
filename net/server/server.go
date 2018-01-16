@@ -7,6 +7,8 @@ import (
 	"log"
 	"net"
 	"strconv"
+
+	"github.com/jinzhu/gorm"
 )
 
 //Configuration ...
@@ -17,15 +19,19 @@ type Configuration struct {
 	KeyPath       string
 	ClientHandler func(conn net.Conn)
 	Mode          string
+	Database      *gorm.DB
 }
 
 //Start ...
 func Start(serverConfig *Configuration) error {
+
+	//Load certs -----------------------------------------------------------------
 	cert, err := tls.LoadX509KeyPair(serverConfig.CertPath, serverConfig.KeyPath)
 	if err != nil {
 		return err
 	}
 	config := tls.Config{Certificates: []tls.Certificate{cert}}
+	// ---------------------------------------------------------------------------
 	config.Rand = rand.Reader
 	service := serverConfig.Address + ":" + strconv.Itoa(serverConfig.Port)
 	listener, err := tls.Listen("tcp", service, &config)

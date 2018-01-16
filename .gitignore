@@ -2,3 +2,4 @@ darkstar
 certs
 *.key
 *.pem
+darkstar.db

