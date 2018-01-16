@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/AlexsJones/darkstar/tls"
 	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	uuid "github.com/nu7hatch/gouuid"
 )
 
@@ -21,7 +23,7 @@ func main() {
 	var serverHostAddress = flag.String("serverhostaddress", "0.0.0.0", "Remote darkstar server address")
 	var serverPort = flag.Int("serverport", 8080, "Server port")
 	var serverMode = flag.String("servermode", "scavange", "Sets the remote C&C operation")
-	var serverSQLLite = flag.String("serverdbpath", "darkstar.db", "Set the sqlite3 database")
+	var serverpath = flag.String("serverdbpath", "darkstar.db", "Set the sqlite3 database")
 	flag.Parse()
 
 	switch *mode {
@@ -53,9 +55,10 @@ func main() {
 		client.Send(config)
 	default:
 		// Connect to database ----------------------------------------------------
-		db, err := gorm.Open("sqlite3", *serverSQLLite)
+		db, err := gorm.Open("sqlite3", *serverpath)
 		if err != nil {
-			panic("failed to connect database")
+			fmt.Println(err.Error())
+			os.Exit(1)
 		}
 		defer db.Close()
 		// ------------------------------------------------------------------------
