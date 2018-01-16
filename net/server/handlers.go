@@ -4,12 +4,14 @@ import (
 	"log"
 	"net"
 
+	"github.com/AlexsJones/darkstar/database/actor"
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/gogo/protobuf/proto"
+	"github.com/jinzhu/gorm"
 )
 
 //ClientHandler is the behaviour on initial request to server
-func ClientHandler(conn net.Conn) {
+func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 	defer conn.Close()
 	buf := make([]byte, 512)
 	for {
@@ -26,8 +28,14 @@ func ClientHandler(conn net.Conn) {
 			log.Printf(err.Error())
 			return
 		}
-		log.Println(message)
 
+		var actor actor.Actor
+		databaseConnection.First(&actor, "identifier = ?", message.ActorID)
+		if &actor != nil {
+			log.Printf("New actor has connected to darkstar %s\n", message.ActorID)
+		} else {
+			log.Printf("Actor %s has reconnected\n", message.ActorID)
+		}
 	}
 	log.Println("server: conn: closed")
 

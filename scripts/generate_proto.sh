@@ -1,1 +1,1 @@
-protoc --go_out=. data/**/*.proto
+protoc --go_out=. net/data/**/*.proto

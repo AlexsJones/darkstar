@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/AlexsJones/darkstar/database"
 	"github.com/AlexsJones/darkstar/net/client"
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/AlexsJones/darkstar/net/server"
@@ -42,7 +43,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		message.UUID = u.String()
+		message.ActorID = u.String()
 
 		out, err := proto.Marshal(message)
 		if err != nil {
@@ -61,6 +62,9 @@ func main() {
 			os.Exit(1)
 		}
 		defer db.Close()
+
+		//Generate tables...
+		database.AutoMigrate(db)
 		// ------------------------------------------------------------------------
 		// tls generate certs -----------------------------------------------------
 		tlsConfiguration := &tls.Configuration{Host: "", ValidFrom: "", ValidFor: 365 * 24 * time.Hour, IsCA: false,

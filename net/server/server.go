@@ -18,7 +18,7 @@ type Configuration struct {
 	Port          int
 	CertPath      string
 	KeyPath       string
-	ClientHandler func(conn net.Conn)
+	ClientHandler func(Database *gorm.DB, conn net.Conn)
 	Mode          string
 	Database      *gorm.DB
 }
@@ -56,7 +56,7 @@ func Start(serverConfig *Configuration) error {
 				log.Print(x509.MarshalPKIXPublicKey(v.PublicKey))
 			}
 		}
-		go serverConfig.ClientHandler(conn)
+		go serverConfig.ClientHandler(serverConfig.Database, conn)
 	}
 	return nil
 }
