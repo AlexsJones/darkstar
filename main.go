@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/AlexsJones/darkstar/client"
-	"github.com/AlexsJones/darkstar/server"
+	"github.com/AlexsJones/darkstar/net/client"
+	"github.com/AlexsJones/darkstar/net/server"
 	"github.com/AlexsJones/darkstar/tls"
 )
 
