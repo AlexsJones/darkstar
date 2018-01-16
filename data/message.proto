@@ -1,0 +1,9 @@
+syntax = "proto3";
+package data;
+import "data/uuid.proto";
+
+message Message {
+
+  UUID uuid = 1;
+
+}
