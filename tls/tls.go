@@ -19,14 +19,15 @@ import (
 
 //TLSConfiguration ...
 type Configuration struct {
-	CertPath   string
-	KeyPath    string
-	Host       string
-	ValidFrom  string
-	ValidFor   time.Duration
-	IsCA       bool
-	RSABits    int
-	EcdsaCurve string
+	CertPath     string
+	KeyPath      string
+	Host         string
+	Organisation string
+	ValidFrom    string
+	ValidFor     time.Duration
+	IsCA         bool
+	RSABits      int
+	EcdsaCurve   string
 }
 
 func publicKey(priv interface{}) interface{} {
@@ -57,7 +58,7 @@ func pemBlockForKey(priv interface{}) *pem.Block {
 }
 
 //GenerateCertificates creates x509 certs
-func GenerateCertificates(tlsConfig *Configuration) {
+func GenerateCertificates(tlsConfig *Configuration) error {
 	var err error
 	var notBefore time.Time
 	var priv interface{}
@@ -92,12 +93,13 @@ func GenerateCertificates(tlsConfig *Configuration) {
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
 		log.Fatalf("failed to generate serial number: %s", err)
+		return err
 	}
 
 	template := x509.Certificate{
 		SerialNumber: serialNumber,
 		Subject: pkix.Name{
-			Organization: []string{"Acme Co"},
+			Organization: []string{tlsConfig.Organisation},
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
@@ -124,22 +126,25 @@ func GenerateCertificates(tlsConfig *Configuration) {
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(priv), priv)
 	if err != nil {
 		log.Fatalf("Failed to create certificate: %s", err)
+		return err
 	}
 
-	certOut, err := os.Create("cert.pem")
+	certOut, err := os.Create(tlsConfig.CertPath)
 	if err != nil {
-		log.Fatalf("failed to open cert.pem for writing: %s", err)
+		log.Fatalf("failed to open %s for writing: %s", tlsConfig.CertPath, err)
+		return err
 	}
 	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	certOut.Close()
-	log.Print("written cert.pem\n")
+	log.Printf("written %s\n", tlsConfig.CertPath)
 
-	keyOut, err := os.OpenFile("key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(tlsConfig.KeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Print("failed to open key.pem for writing:", err)
-		return
+		log.Printf("failed to open %s for writing: %s", tlsConfig.KeyPath, err)
+		return err
 	}
 	pem.Encode(keyOut, pemBlockForKey(priv))
 	keyOut.Close()
-	log.Print("written key.pem\n")
+	log.Printf("written %s\n", tlsConfig.KeyPath)
+	return nil
 }
