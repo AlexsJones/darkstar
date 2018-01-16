@@ -40,16 +40,16 @@ func Send(clientconfig *Configuration) error {
 	log.Println("client: handshake: ", state.HandshakeComplete)
 	log.Println("client: mutual: ", state.NegotiatedProtocolIsMutual)
 
-	for {
-		n, err := io.WriteString(conn, clientconfig.Message)
-		if err != nil {
-			log.Fatalf("client: write: %s", err)
-		}
-		log.Printf("client: wrote %q (%d bytes)", clientconfig.Message, n)
-
-		reply := make([]byte, 256)
-		n, err = conn.Read(reply)
-		log.Printf("client: read %q (%d bytes)", string(reply[:n]), n)
-		log.Print("client: exiting")
+	n, err := io.WriteString(conn, clientconfig.Message)
+	if err != nil {
+		log.Fatalf("client: write: %s", err)
 	}
+	log.Printf("client: wrote %q (%d bytes)", clientconfig.Message, n)
+
+	reply := make([]byte, 256)
+	n, err = conn.Read(reply)
+	log.Printf("client: read %q (%d bytes)", string(reply[:n]), n)
+	log.Print("client: exiting")
+
+	return nil
 }

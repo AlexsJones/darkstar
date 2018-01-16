@@ -3,6 +3,9 @@ package server
 import (
 	"log"
 	"net"
+
+	"github.com/AlexsJones/darkstar/data/message"
+	"github.com/gogo/protobuf/proto"
 )
 
 //ClientHandler is the behaviour on initial request to server
@@ -18,15 +21,12 @@ func ClientHandler(conn net.Conn) {
 			}
 			break
 		}
-		log.Printf("server: conn: echo %q\n", string(buf[:n]))
-		n, err = conn.Write(buf[:n])
-
-		log.Printf("server: conn: wrote %d bytes", n)
-
-		if err != nil {
-			log.Printf("server: write: %s", err)
-			break
+		message := &message.Message{}
+		if err := proto.Unmarshal(buf[:n], message); err != nil {
+			log.Printf(err.Error())
+			return
 		}
+		log.Println(message)
 	}
 	log.Println("server: conn: closed")
 

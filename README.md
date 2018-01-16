@@ -7,5 +7,14 @@ Command and control program in golang
 - Arbitrary code execution (WIP)
 
 ## Usage
-`darkstar #server mode`
+`darkstar -mode=server -operation=scavange`
 `darkstar -mode=client -serverhostaddress=0.0.0.0`
+
+
+
+| Client        | Direction     | Server        |
+| ------------- | ------------- | ------------- |
+| Message       | ->            |               |
+|               | <-            | Operation mode|
+| Work          |               |               |
+| Message       | ->            |               |

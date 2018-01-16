@@ -16,6 +16,7 @@ type Configuration struct {
 	CertPath      string
 	KeyPath       string
 	ClientHandler func(conn net.Conn)
+	Mode          string
 }
 
 //Start ...
