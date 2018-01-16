@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/AlexsJones/darkstar/data/message"
 	"github.com/AlexsJones/darkstar/net/client"
+	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/AlexsJones/darkstar/net/server"
 	"github.com/AlexsJones/darkstar/tls"
 	"github.com/gogo/protobuf/proto"

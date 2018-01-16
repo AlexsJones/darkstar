@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/AlexsJones/darkstar/data/message"
+	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/gogo/protobuf/proto"
 )
 
