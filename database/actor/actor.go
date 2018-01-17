@@ -2,8 +2,16 @@ package actor
 
 import "github.com/jinzhu/gorm"
 
-//Actor ...
+//Actor ORM from the message DTO
 type Actor struct {
 	gorm.Model
-	Identifier string
+	ActorID   string
+	IPAddress string
+	GoOS      string
+	Kernel    string
+	Core      string
+	Platform  string
+	OS        string
+	Hostname  string
+	CPUs      int32
 }

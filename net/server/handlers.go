@@ -8,6 +8,7 @@ import (
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
+	model "gopkg.in/jeevatkm/go-model.v1"
 )
 
 //ClientHandler is the behaviour on initial request to server
@@ -29,14 +30,23 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 			return
 		}
 
-		var actor actor.Actor
-		databaseConnection.First(&actor, "identifier = ?", message.ActorID)
-		if &actor != nil {
+		var ac actor.Actor
+		databaseConnection.First(&ac, "id = ?", message.ActorID)
+		if &ac != nil {
 			log.Printf("New actor has connected to darkstar %s:%s\n", message.ActorID, message.IPAddress)
+			//Map actor -----------------------------------------------------------------------
+			var newactor actor.Actor
+			errs := model.Copy(&newactor, message)
+			if errs != nil {
+				log.Println(errs)
+			}
+			//---------------------------------------------------------------------------------
+			//Insert actor --------------------------------------------------------------------
+			databaseConnection.Create(&newactor)
+			//---------------------------------------------------------------------------------
 		} else {
-			log.Printf("Actor %s:%s has reconnected\n", message.ActorID, message.IPAddress)
+			log.Printf("Actor %s:%s has reconnected\n", ac.ActorID, ac.IPAddress)
 		}
-		log.Print(message)
 	}
 	log.Println("server: conn: closed")
 
