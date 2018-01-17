@@ -9,13 +9,10 @@ import (
 
 	"github.com/AlexsJones/darkstar/database"
 	"github.com/AlexsJones/darkstar/net/client"
-	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/AlexsJones/darkstar/net/server"
 	"github.com/AlexsJones/darkstar/tls"
-	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	uuid "github.com/nu7hatch/gouuid"
 )
 
 func main() {
@@ -38,21 +35,11 @@ func main() {
 		}
 
 		//Create the initial phone home message------------------------------------
-		message := &message.Message{}
-		u, err := uuid.NewV4()
-		if err != nil {
-			log.Fatal(err)
-		}
-		message.ActorID = u.String()
-
-		out, err := proto.Marshal(message)
-		if err != nil {
-			log.Printf(err.Error())
-			os.Exit(1)
-		}
+		out := client.CreateMessage()
 		//--------------------------------------------------------------------------
 		config := &client.Configuration{Message: string(out),
 			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort}
+		//Send boot message
 		client.Send(config)
 	default:
 		// Connect to database ----------------------------------------------------

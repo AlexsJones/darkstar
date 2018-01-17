@@ -2,4 +2,12 @@ syntax = "proto3";
 package message;
 message Message {
   string ActorID = 1;
+  string IPAddress = 2;
+  string GoOS = 3;
+	string Kernel = 4;
+	string Core = 5;
+	string Platform = 6;
+	string OS = 7;
+	string Hostname = 8;
+	int32 CPUs = 9;
 }

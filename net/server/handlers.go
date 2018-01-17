@@ -32,10 +32,11 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 		var actor actor.Actor
 		databaseConnection.First(&actor, "identifier = ?", message.ActorID)
 		if &actor != nil {
-			log.Printf("New actor has connected to darkstar %s\n", message.ActorID)
+			log.Printf("New actor has connected to darkstar %s:%s\n", message.ActorID, message.IPAddress)
 		} else {
-			log.Printf("Actor %s has reconnected\n", message.ActorID)
+			log.Printf("Actor %s:%s has reconnected\n", message.ActorID, message.IPAddress)
 		}
+		log.Print(message)
 	}
 	log.Println("server: conn: closed")
 
