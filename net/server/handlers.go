@@ -31,8 +31,8 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 		}
 
 		var ac actor.Actor
-		databaseConnection.First(&ac, "id = ?", message.ActorID)
-		if &ac != nil {
+		databaseConnection.First(&ac, "actorid = ?", message.ActorID)
+		if &ac == nil {
 			log.Printf("New actor has connected to darkstar %s:%s\n", message.ActorID, message.IPAddress)
 			//Map actor -----------------------------------------------------------------------
 			var newactor actor.Actor

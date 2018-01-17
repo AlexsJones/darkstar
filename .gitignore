@@ -3,3 +3,5 @@ certs
 *.key
 *.pem
 darkstar.db
+
+*journal
