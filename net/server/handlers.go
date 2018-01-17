@@ -6,6 +6,7 @@ import (
 
 	"github.com/AlexsJones/darkstar/database/actor"
 	"github.com/AlexsJones/darkstar/net/data/message"
+	"github.com/fatih/color"
 	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	model "gopkg.in/jeevatkm/go-model.v1"
@@ -29,23 +30,26 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 			log.Printf(err.Error())
 			return
 		}
-
 		var ac actor.Actor
-		databaseConnection.First(&ac, "actorid = ?", message.ActorID)
-		if &ac == nil {
-			log.Printf("New actor has connected to darkstar %s:%s\n", message.ActorID, message.IPAddress)
+
+		if err := databaseConnection.Find(&ac, actor.Actor{ActorID: message.ActorID}).Error; err != nil {
+
+			color.Red(err.Error())
+
 			//Map actor -----------------------------------------------------------------------
 			var newactor actor.Actor
 			errs := model.Copy(&newactor, message)
 			if errs != nil {
 				log.Println(errs)
 			}
+
+			log.Printf("New actor has connected to darkstar %+v\n", newactor)
 			//---------------------------------------------------------------------------------
 			//Insert actor --------------------------------------------------------------------
 			databaseConnection.Create(&newactor)
 			//---------------------------------------------------------------------------------
 		} else {
-			log.Printf("Actor %s:%s has reconnected\n", ac.ActorID, ac.IPAddress)
+			log.Printf("Actor has reconnected %+v\n", ac)
 		}
 	}
 	log.Println("server: conn: closed")
