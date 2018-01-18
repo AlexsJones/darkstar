@@ -5,9 +5,9 @@ import (
 	"net"
 
 	"github.com/AlexsJones/darkstar/database/actor"
+	"github.com/AlexsJones/darkstar/net/data"
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/fatih/color"
-	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	model "gopkg.in/jeevatkm/go-model.v1"
 )
@@ -25,33 +25,43 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 			}
 			break
 		}
-		message := &message.Message{}
-		if err := proto.Unmarshal(buf[:n], message); err != nil {
-			log.Printf(err.Error())
-			return
-		}
-		var ac actor.Actor
+		//TODO move this into another module
 
-		if err := databaseConnection.Find(&ac, actor.Actor{ActorID: message.ActorID}).Error; err != nil {
+		iface, t := data.TryUnmarshal(buf[:n])
+		switch t {
+		case data.ProtoMessage:
+			message := iface.(*message.Message)
+			var ac actor.Actor
 
-			color.Red(err.Error())
+			//Check for existing actor ----------------------------------------------
+			if err := databaseConnection.Find(&ac, actor.Actor{ActorID: message.ActorID}).Error; err != nil {
 
-			//Map actor -----------------------------------------------------------------------
-			var newactor actor.Actor
-			errs := model.Copy(&newactor, message)
-			if errs != nil {
-				log.Println(errs)
+				color.Red(err.Error())
+
+				//Map actor -------------------------------------------------------------
+				var newactor actor.Actor
+				errs := model.Copy(&newactor, message)
+				if errs != nil {
+					log.Println(errs)
+				}
+
+				log.Printf("New actor has connected to darkstar %+v\n", newactor)
+				//-----------------------------------------------------------------------
+				//Insert actor ----------------------------------------------------------
+				if err := databaseConnection.Create(&newactor).Error; err != nil {
+					color.Red(err.Error())
+				}
+				//-----------------------------------------------------------------------
+			} else {
+				log.Printf("Actor has reconnected %+v\n", ac)
 			}
+			//Reply -------------------------------------------------------------------
+			conn.Write([]byte("OK"))
+			//-------------------------------------------------------------------------
+			log.Println("server: conn: closed")
 
-			log.Printf("New actor has connected to darkstar %+v\n", newactor)
-			//---------------------------------------------------------------------------------
-			//Insert actor --------------------------------------------------------------------
-			databaseConnection.Create(&newactor)
-			//---------------------------------------------------------------------------------
-		} else {
-			log.Printf("Actor has reconnected %+v\n", ac)
+		case data.ProtoOperation:
+
 		}
 	}
-	log.Println("server: conn: closed")
-
 }

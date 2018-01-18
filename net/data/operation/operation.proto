@@ -1,0 +1,5 @@
+syntax = "proto3";
+package operation;
+message Operation {
+  string ModuleName = 1;
+}
