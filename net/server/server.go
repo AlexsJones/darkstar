@@ -6,8 +6,11 @@ import (
 	"crypto/x509"
 	"log"
 	"net"
+	"os"
 	"strconv"
 
+	"github.com/AlexsJones/darkstar/net/data/instruction"
+	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -18,7 +21,7 @@ type Configuration struct {
 	Port          int
 	CertPath      string
 	KeyPath       string
-	ClientHandler func(Database *gorm.DB, conn net.Conn)
+	ClientHandler func(Database *gorm.DB, conn net.Conn, serverConfig *Configuration)
 	Mode          string
 	Database      *gorm.DB
 }
@@ -56,7 +59,20 @@ func Start(serverConfig *Configuration) error {
 				log.Print(x509.MarshalPKIXPublicKey(v.PublicKey))
 			}
 		}
-		go serverConfig.ClientHandler(serverConfig.Database, conn)
+		go serverConfig.ClientHandler(serverConfig.Database, conn, serverConfig)
 	}
 	return nil
+}
+
+//CreateInstruction ....
+func CreateInstruction(serverConfig *Configuration) string {
+
+	ins := &instruction.Instruction{ModuleName: serverConfig.Mode}
+	out, err := proto.Marshal(ins)
+	if err != nil {
+		log.Printf(err.Error())
+		os.Exit(1)
+	}
+	return string(out)
+
 }

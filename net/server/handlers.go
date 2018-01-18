@@ -13,7 +13,7 @@ import (
 )
 
 //ClientHandler is the behaviour on initial request to server
-func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
+func ClientHandler(databaseConnection *gorm.DB, conn net.Conn, serverConfig *Configuration) {
 	defer conn.Close()
 	buf := make([]byte, 512)
 	for {
@@ -56,7 +56,9 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn) {
 				log.Printf("Actor has reconnected %+v\n", ac)
 			}
 			//Reply -------------------------------------------------------------------
-			conn.Write([]byte("OK"))
+			ins := CreateInstruction(serverConfig)
+
+			conn.Write([]byte(ins))
 			//-------------------------------------------------------------------------
 			log.Println("server: conn: closed")
 
