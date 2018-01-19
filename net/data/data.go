@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/AlexsJones/darkstar/net/data/instruction"
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/AlexsJones/darkstar/net/data/operation"
 	"github.com/gogo/protobuf/proto"
@@ -12,6 +13,7 @@ type Protocoltype int
 const (
 	ProtoMessage Protocoltype = iota
 	ProtoOperation
+	ProtoInstruction
 	ProtoUnknown
 )
 
@@ -25,6 +27,11 @@ func TryUnmarshal(raw []byte) (interface{}, Protocoltype) {
 	o := &operation.Operation{}
 	if err := proto.Unmarshal(raw, o); err == nil {
 		return o, ProtoOperation
+	}
+
+	i := &instruction.Instruction{}
+	if err := proto.Unmarshal(raw, i); err == nil {
+		return i, ProtoInstruction
 	}
 
 	return nil, ProtoUnknown

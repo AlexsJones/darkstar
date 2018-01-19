@@ -1,5 +1,7 @@
 # darkstar
 
+![example](resources/attack.png)
+
 Command and control program in golang
 
 - Rotates tls keys per run.
