@@ -6,14 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strconv"
-
-	"github.com/AlexsJones/darkstar/net"
-	"github.com/AlexsJones/darkstar/net/data/message"
-	"github.com/gogo/protobuf/proto"
-	"github.com/matishsiao/goInfo"
-	uuid "github.com/nu7hatch/gouuid"
 )
 
 //Configuration ...
@@ -58,36 +51,9 @@ func Send(clientconfig *Configuration) error {
 	if err != nil {
 		log.Fatalf("client: write: %s", err)
 	}
-
-	ServerHandler(reply)
+	log.Printf("Receieved reply of %d bytes\n", n)
+	//Process reply
+	ServerHandler(reply[:n])
 
 	return nil
-}
-
-//CreateMessage ...
-func CreateMessage() string {
-
-	gi := goInfo.GetInfo()
-	message := &message.Message{}
-	u, err := uuid.NewV4()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	message.ActorID = u.String()
-	message.IPAddress = net.GetLocalIP().String()
-	message.GoOS = gi.GoOS
-	message.Core = gi.Core
-	message.Hostname = gi.Hostname
-	message.Kernel = gi.Kernel
-	message.OS = gi.OS
-	message.Platform = gi.Platform
-	message.CPUs = int32(gi.CPUs)
-
-	out, err := proto.Marshal(message)
-	if err != nil {
-		log.Printf(err.Error())
-		os.Exit(1)
-	}
-	return string(out)
 }

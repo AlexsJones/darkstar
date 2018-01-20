@@ -9,6 +9,7 @@ import (
 
 	"github.com/AlexsJones/darkstar/database"
 	"github.com/AlexsJones/darkstar/net/client"
+	"github.com/AlexsJones/darkstar/net/data"
 	"github.com/AlexsJones/darkstar/net/server"
 	"github.com/AlexsJones/darkstar/tls"
 	"github.com/jinzhu/gorm"
@@ -35,7 +36,7 @@ func main() {
 		}
 
 		//Create the initial phone home message------------------------------------
-		out := client.CreateMessage()
+		out := data.CreateMessage()
 		//--------------------------------------------------------------------------
 		config := &client.Configuration{Message: string(out),
 			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort}
@@ -64,7 +65,7 @@ func main() {
 		conf := &server.Configuration{Address: "0.0.0.0", CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath,
 			Port:          *serverPort,
 			ClientHandler: server.ClientHandler,
-			Mode:          *serverMode,
+			ModuleName:    *serverMode,
 			Database:      db,
 		}
 		if err := server.Start(conf); err != nil {

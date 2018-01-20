@@ -10,4 +10,11 @@ message Message {
 	string OS = 7;
 	string Hostname = 8;
 	int32 CPUs = 9;
+
+
+  message Instruction {
+    string ModuleName = 1;
+  }
+
+  Instruction CurrentInstruction = 10;
 }

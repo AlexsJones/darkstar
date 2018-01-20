@@ -1,5 +1,0 @@
-syntax = "proto3";
-package instruction;
-message Instruction {
-  string ModuleName = 1;
-}

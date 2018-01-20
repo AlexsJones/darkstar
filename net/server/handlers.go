@@ -55,15 +55,15 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn, serverConfig *Con
 			} else {
 				log.Printf("Actor has reconnected %+v\n", ac)
 			}
-			//Reply -------------------------------------------------------------------
-			ins := CreateInstruction(serverConfig)
-
-			conn.Write([]byte(ins))
+			//Reply is based from the incoming message with modified sub object -------
+			ins := data.UpgradeMessage(message, serverConfig.ModuleName)
+			n, _ := conn.Write([]byte(ins))
+			log.Printf("Wrote %d byte response\n", n)
 			//-------------------------------------------------------------------------
 			log.Println("server: conn: closed")
 
-		case data.ProtoOperation:
-
+		case data.ProtoUnknown:
+			color.Red("Receieved an unknown message type")
 		}
 	}
 }

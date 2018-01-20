@@ -6,11 +6,8 @@ import (
 	"crypto/x509"
 	"log"
 	"net"
-	"os"
 	"strconv"
 
-	"github.com/AlexsJones/darkstar/net/data/instruction"
-	"github.com/gogo/protobuf/proto"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -22,7 +19,7 @@ type Configuration struct {
 	CertPath      string
 	KeyPath       string
 	ClientHandler func(Database *gorm.DB, conn net.Conn, serverConfig *Configuration)
-	Mode          string
+	ModuleName    string
 	Database      *gorm.DB
 }
 
@@ -62,17 +59,4 @@ func Start(serverConfig *Configuration) error {
 		go serverConfig.ClientHandler(serverConfig.Database, conn, serverConfig)
 	}
 	return nil
-}
-
-//CreateInstruction ....
-func CreateInstruction(serverConfig *Configuration) string {
-
-	ins := &instruction.Instruction{ModuleName: serverConfig.Mode}
-	out, err := proto.Marshal(ins)
-	if err != nil {
-		log.Printf(err.Error())
-		os.Exit(1)
-	}
-	return string(out)
-
 }
