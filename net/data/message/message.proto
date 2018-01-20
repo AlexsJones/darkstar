@@ -14,6 +14,13 @@ message Message {
 
   message Instruction {
     string ModuleName = 1;
+
+
+    message Payload {
+      string Data = 1;
+    }
+
+    Payload ModulePayload = 2;  
   }
 
   Instruction CurrentInstruction = 10;

@@ -16,7 +16,13 @@ func ServerHandler(raw []byte) {
 	case data.ProtoMessage:
 		log.Println("Received message")
 		m := iface.(*message.Message)
-		log.Println(m)
+
+		ins := m.GetCurrentInstruction()
+		if ins != nil {
+
+		} else {
+			log.Println("Receieved message had no current instruction")
+		}
 	case data.ProtoUnknown:
 		log.Println("Protocol received unknown")
 	}

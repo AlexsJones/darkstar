@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -52,16 +53,29 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn, serverConfig *Con
 					color.Red(err.Error())
 				}
 				//-----------------------------------------------------------------------
+				ac = newactor
 			} else {
 				log.Printf("Actor has reconnected %+v\n", ac)
 			}
 			//Reply is based from the incoming message with modified sub object -------
+			//This makes sure each pulse from the client has the lastest module set ---
 			ins := data.UpgradeMessage(message, serverConfig.ModuleName)
 			n, _ := conn.Write([]byte(ins))
 			log.Printf("Wrote %d byte response\n", n)
 			//-------------------------------------------------------------------------
 			log.Println("server: conn: closed")
+			// Analyze any payload data received --------------------------------------
 
+			if message.CurrentInstruction != nil {
+				log.Printf("Reading actor instruction %s payload\n", message.CurrentInstruction.ModuleName)
+				if message.CurrentInstruction.ModulePayload != nil {
+
+				} else {
+					color.Red(fmt.Sprintf("Actor %s module %s payload was empty\n", ac.ActorID, message.CurrentInstruction.ModuleName))
+				}
+
+			}
+			//-----------------------------------------------------------------------
 		case data.ProtoUnknown:
 			color.Red("Receieved an unknown message type")
 		}
