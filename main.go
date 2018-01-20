@@ -39,9 +39,9 @@ func main() {
 		out := data.CreateMessage()
 		//--------------------------------------------------------------------------
 		config := &client.Configuration{Message: string(out),
-			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort}
-		//Send boot message
-		client.Send(config)
+			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort, SleepTime: time.Second}
+		//Starts the client loop
+		client.Run(config)
 	default:
 		// Connect to database ----------------------------------------------------
 		db, err := gorm.Open("sqlite3", *serverpath)
@@ -68,7 +68,7 @@ func main() {
 			ModuleName:    *serverMode,
 			Database:      db,
 		}
-		if err := server.Start(conf); err != nil {
+		if err := server.Run(conf); err != nil {
 			log.Printf(err.Error())
 		}
 	}

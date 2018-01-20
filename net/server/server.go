@@ -23,8 +23,8 @@ type Configuration struct {
 	Database      *gorm.DB
 }
 
-//Start ...
-func Start(serverConfig *Configuration) error {
+//Run ...
+func Run(serverConfig *Configuration) error {
 
 	//Load certs -----------------------------------------------------------------
 	cert, err := tls.LoadX509KeyPair(serverConfig.CertPath, serverConfig.KeyPath)

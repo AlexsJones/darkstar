@@ -69,7 +69,7 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn, serverConfig *Con
 			if message.CurrentInstruction != nil {
 				log.Printf("Reading actor instruction %s payload\n", message.CurrentInstruction.ModuleName)
 				if message.CurrentInstruction.ModulePayload != nil {
-
+					color.Green(fmt.Sprintf("Actor %s module %s payload has been received\n", ac.ActorID, message.CurrentInstruction.ModuleName))
 				} else {
 					color.Red(fmt.Sprintf("Actor %s module %s payload was empty\n", ac.ActorID, message.CurrentInstruction.ModuleName))
 				}
