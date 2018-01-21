@@ -8,4 +8,5 @@ import (
 //AutoMigrate creates tables
 func AutoMigrate(databaseConnection *gorm.DB) {
 	databaseConnection.AutoMigrate(&message.Message{})
+	databaseConnection.AutoMigrate(&Module{})
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/AlexsJones/darkstar/database"
 	"github.com/AlexsJones/darkstar/net/data"
 	"github.com/AlexsJones/darkstar/net/data/message"
 	"github.com/fatih/color"
@@ -54,6 +55,10 @@ func ClientHandler(databaseConnection *gorm.DB, conn net.Conn, serverConfig *Con
 				if msg.GetCurrentInstruction() != nil {
 					if len(msg.GetCurrentInstruction().ModulePayload.Data) > 0 {
 						color.Green(fmt.Sprintf("Retrieved Actor %s module %s payload data\n", msg.ActorID, msg.CurrentInstruction.ModuleName))
+
+						if err := databaseConnection.Create(&database.Module{ActorID: msg.ActorID, ModuleName: msg.CurrentInstruction.ModuleName, Data: msg.CurrentInstruction.ModulePayload.Data}).Error; err != nil {
+							color.Red(err.Error())
+						}
 					}
 				}
 			}
