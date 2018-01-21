@@ -18,7 +18,7 @@ e.g. `touch /usr/local/share/darkstar.db`
 
 
 ## Usage
-`darkstar -mode=server -operation=scavange -serverdbpath=/usr/local/share/darkstar.db`
+`darkstar -mode=server -module=scavange -serverdbpath=/usr/local/share/darkstar.db`
 `darkstar -mode=client -serverhostaddress=0.0.0.0`
 
 
@@ -29,3 +29,10 @@ e.g. `touch /usr/local/share/darkstar.db`
 |               | <-            |                  ActorDetails + Instruction |
 | Work          |               |               |                 |
 | Message       | ->            | ActorDetails + Instruction + Payload  |                |
+
+
+## Modules & development
+
+The module system uses interfaces and it is easy to add your own modules in.
+
+Modify firstly `loader.go` and secondly create your module .g. `unix/timestamp.go`

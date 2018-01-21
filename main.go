@@ -21,7 +21,7 @@ func main() {
 	var clientPort = flag.Int("clientport", 8080, "Client port")
 	var serverHostAddress = flag.String("serverhostaddress", "0.0.0.0", "Remote darkstar server address")
 	var serverPort = flag.Int("serverport", 8080, "Server port")
-	var serverMode = flag.String("servermode", "scavange", "Sets the remote C&C operation")
+	var serverModule = flag.String("module", "scavange", "Sets the remote C&C operation")
 	var serverpath = flag.String("serverdbpath", "darkstar.db", "Set the sqlite3 database")
 	flag.Parse()
 
@@ -75,7 +75,7 @@ func main() {
 		conf := &server.Configuration{Address: "0.0.0.0", CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath,
 			Port:          *serverPort,
 			ClientHandler: server.ClientHandler,
-			ModuleName:    *serverMode,
+			ModuleName:    *serverModule,
 			Database:      db,
 		}
 		if err := server.Run(conf); err != nil {
