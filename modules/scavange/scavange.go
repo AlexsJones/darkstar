@@ -8,13 +8,16 @@ import (
 
 //Scavange ...
 type Scavange struct {
+	CurrentTime time.Time
 }
 
 //Execute ...
-func (*Scavange) Execute() string {
+func (s *Scavange) Execute() string {
 
-	b, err := json.Marshal(struct{ Time time.Time }{time.Now()})
-	if err != nil {
+	s.CurrentTime = time.Now()
+
+	b, err := json.Marshal(s)
+	if err == nil {
 		return string(b)
 	}
 	fmt.Println("Error marshalling data into JSON")
