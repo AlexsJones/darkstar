@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"log"
-	"net"
 
 	"github.com/AlexsJones/darkstar/modules"
 	"github.com/AlexsJones/darkstar/net/data"
@@ -11,8 +10,8 @@ import (
 	"github.com/fatih/color"
 )
 
-//ServerHandler reads instruction sets ...
-func ServerHandler(raw []byte, conn net.Conn) {
+//ResponseProcessor reads instruction sets ...
+func ResponseProcessor(raw []byte) (string, bool) {
 
 	iface, t := data.TryUnmarshal(raw)
 	switch t {
@@ -31,9 +30,11 @@ func ServerHandler(raw []byte, conn net.Conn) {
 			}
 			color.Green(fmt.Sprintf("Loaded %s module\n", ins.ModuleName))
 			//Execute module now has run
-			data := modules.IModule.Execute(iface)
+			d := modules.IModule.Execute(iface)
 
-			conn.Write([]byte(data))
+			msg := data.MessageAddPayload(m, d)
+
+			return msg, true
 
 		} else {
 			log.Println("Receieved message had no current instruction")
@@ -41,4 +42,6 @@ func ServerHandler(raw []byte, conn net.Conn) {
 	case data.ProtoUnknown:
 		log.Println("Protocol received unknown")
 	}
+
+	return "", false
 }

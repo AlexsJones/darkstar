@@ -38,10 +38,20 @@ func main() {
 		//Create the initial phone home message------------------------------------
 		out := data.CreateMessage()
 		//--------------------------------------------------------------------------
-		config := &client.Configuration{Message: string(out),
-			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort, SleepTime: time.Second}
-		//Starts the client loop
-		client.Run(config)
+		config := &client.Configuration{
+			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort, SleepTime: time.Second * 3}
+		//Sends the initial client message
+		for {
+			r, n := client.Send(config, string(out))
+
+			processedResponse, shouldSend := client.ResponseProcessor(r[:n])
+			if shouldSend {
+				log.Println("-------------------Parsed response from server and sending an update-------------------")
+				client.Send(config, processedResponse)
+			}
+			time.Sleep(config.SleepTime)
+		}
+
 	default:
 		// Connect to database ----------------------------------------------------
 		db, err := gorm.Open("sqlite3", *serverpath)

@@ -23,9 +23,9 @@ e.g. `touch /usr/local/share/darkstar.db`
 
 
 
-| Client        | Direction     | Server        |
-| ------------- | ------------- | ------------- |
-| Message       | ->            |               |
-|               | <-            | Operation mode|
-| Work          |               |               |
-| Message       | ->            |               |
+| Client        | Direction     | Message Digest | Server        |
+| ------------- | ------------- | -------------  | ------------- |
+| Message       | ->            | ActorDetails  | Process incoming |
+|               | <-            |                  ActorDetails + Instruction |
+| Work          |               |               |                 |
+| Message       | ->            | ActorDetails + Instruction + Payload  |                |

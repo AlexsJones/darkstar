@@ -13,15 +13,15 @@ message Message {
 
 
   message Instruction {
-    string ModuleName = 1;
+    string ModuleName = 10;
 
 
     message Payload {
-      string Data = 1;
+      string Data = 11;
     }
 
-    Payload ModulePayload = 2;  
+    Payload ModulePayload = 12;
   }
 
-  Instruction CurrentInstruction = 10;
+  Instruction CurrentInstruction = 13;
 }

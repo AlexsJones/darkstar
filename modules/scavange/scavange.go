@@ -7,5 +7,5 @@ type Scavange struct {
 //Execute ...
 func (*Scavange) Execute() string {
 
-	return ""
+	return "data"
 }

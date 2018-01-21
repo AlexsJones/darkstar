@@ -58,11 +58,24 @@ func CreateMessage() string {
 	return string(out)
 }
 
-//UpgradeMessage adds additional information into a message
-func UpgradeMessage(msg *message.Message, moduleName string) string {
+//MessageAddInstruction adds additional information into a message
+func MessageAddInstruction(msg *message.Message, moduleName string) string {
 
 	//Add the instruction
 	msg.CurrentInstruction = &message.Message_Instruction{ModuleName: moduleName}
+	out, err := proto.Marshal(msg)
+	if err != nil {
+		log.Printf(err.Error())
+		os.Exit(1)
+	}
+	return string(out)
+}
+
+//MessageAddPayload adds additional information into a message
+func MessageAddPayload(msg *message.Message, payload string) string {
+
+	//Add the instruction
+	msg.CurrentInstruction.ModulePayload = &message.Message_Instruction_Payload{Data: payload}
 	out, err := proto.Marshal(msg)
 	if err != nil {
 		log.Printf(err.Error())
