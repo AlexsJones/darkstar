@@ -26,6 +26,30 @@ type Configuration struct {
 //Run ...
 func Run(serverConfig *Configuration) error {
 
+	service := serverConfig.Address + ":" + strconv.Itoa(serverConfig.Port)
+	srvconn, err := net.Listen("tcp", service)
+	if err != nil {
+		return err
+	}
+
+	defer srvconn.Close()
+
+	log.Print("server: listening")
+	for {
+		conn, err := srvconn.Accept()
+		if err != nil {
+			log.Printf("server: accept: %s", err)
+			break
+		}
+		log.Printf("server: accepted from %s", conn.RemoteAddr())
+		go serverConfig.ClientHandler(serverConfig.Database, conn, serverConfig)
+	}
+	return nil
+}
+
+//RunTLS ...
+func RunTLS(serverConfig *Configuration) error {
+
 	//Load certs -----------------------------------------------------------------
 	cert, err := tls.LoadX509KeyPair(serverConfig.CertPath, serverConfig.KeyPath)
 	if err != nil {

@@ -1,12 +1,13 @@
 # darkstar
 
-![example](resources/attack.png)
+![example](resources/darkstar.png)
 
 Command and control program in golang
 
 - Rotates tls keys per run.
 - TCP hole punching
 - Arbitrary code execution (WIP)
+- TLS or SOCKS5
 
 # Requirements
 
@@ -19,6 +20,8 @@ e.g. `touch /usr/local/share/darkstar.db`
 
 ## Usage
 `darkstar -mode=server -module=scavange -serverdbpath=/usr/local/share/darkstar.db`
+
+
 `darkstar -mode=client -serverhostaddress=0.0.0.0`
 
 
@@ -30,6 +33,12 @@ e.g. `touch /usr/local/share/darkstar.db`
 | Work          |               |               |                 |
 | Message       | ->            | ActorDetails + Instruction + Payload  |                |
 
+
+## Transport Modes
+
+Enable SOCKS proxy on a server you control
+
+`ssh -A -f -N -D  0.0.0.0:1080 root@localhost`
 
 ## Modules & development
 
