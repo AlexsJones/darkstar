@@ -50,7 +50,7 @@ func main() {
 		// ------------------------------------------------------------------------
 		//SOCKS Mode configuration ------------------------------------------------
 		var auth *proxy.Auth
-		if strings.Compare(*socksProxyUser, "") != 0 && strings.Compare(*socksProxyPass, "") != 0 {
+		if *socksProxyUser != "" && *socksProxyPass != "" {
 			auth = &proxy.Auth{User: *socksProxyUser, Password: *socksProxyPass}
 		} else {
 			auth = nil
