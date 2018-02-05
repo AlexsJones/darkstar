@@ -16,7 +16,6 @@ Command and control program in golang
 # Requirements
 
 - A sqlite3 database for the server mode e.g. `touch /usr/local/share/darkstar.db`
-- Proxy SOCKS server `ssh -N -D 0.0.0.0:8080 root@localhost`
 
 ## Usage
 

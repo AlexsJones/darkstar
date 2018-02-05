@@ -81,7 +81,23 @@ func main() {
 			processedResponse, shouldSend := client.ResponseProcessor(bytesout[:num])
 			if shouldSend {
 				log.Println("-------------------Parsed response from server and sending an update-------------------")
-				client.SendTLS(config, processedResponse)
+
+				if strings.Compare(*transportMode, "DIRECTTLS") == 0 {
+					log.Println("Using DIRECTTLS sender")
+					bytesout, num = client.SendTLS(config, processedResponse)
+				} else {
+					log.Println("Using SOCKS sender")
+
+					config.ProxyAddress = *socksProxyAddress
+					prt, err := strconv.Atoi(*socksProxyPort)
+					if err != nil {
+						panic(err)
+					}
+					config.ProxyPort = prt
+
+					bytesout, num = client.SendSOCKS(config, processedResponse)
+				}
+
 			}
 			time.Sleep(config.SleepTime)
 		}
