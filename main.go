@@ -16,6 +16,7 @@ import (
 	"github.com/AlexsJones/darkstar/tls"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"golang.org/x/net/proxy"
 )
 
 func main() {
@@ -28,6 +29,8 @@ func main() {
 	var transportMode = flag.String("transportmode", "SOCKS", "SOCKS or DIRECTTLS")
 	var socksProxyAddress = flag.String("socksproxy", "", "Set the remote socks proxy server to connect too")
 	var socksProxyPort = flag.String("socksport", "", "Set the remote socks proxy port to connect too")
+	var socksProxyUser = flag.String("socksuser", "", "Add a remote user to authenticate with")
+	var socksProxyPass = flag.String("sockspass", "", "Add a remote password to authenticate with")
 	flag.Parse()
 
 	switch *mode {
@@ -46,9 +49,16 @@ func main() {
 		}
 		// ------------------------------------------------------------------------
 		//SOCKS Mode configuration ------------------------------------------------
+		var auth *proxy.Auth
+		if strings.Compare(*socksProxyUser, "") != 0 && strings.Compare(*socksProxyPass, "") != 0 {
+			auth = &proxy.Auth{User: *socksProxyUser, Password: *socksProxyPass}
+		} else {
+			auth = nil
+		}
 
 		config := &client.Configuration{
-			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort, SleepTime: time.Second * 3}
+			Address: *serverHostAddress, CertPath: tlsConfiguration.CertPath, KeyPath: tlsConfiguration.KeyPath, Port: *clientPort,
+			Auth: auth, SleepTime: time.Second * 3}
 		//Sends the initial client message
 		for {
 			var bytesout []byte

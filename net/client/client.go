@@ -24,13 +24,15 @@ type Configuration struct {
 	//SOCKS ------------------
 	ProxyAddress string
 	ProxyPort    int
+	Auth         *proxy.Auth
 	// -----------------------
 	SleepTime time.Duration
 }
 
 //SendSOCKS ...
 func SendSOCKS(clientconfig *Configuration, message string) ([]byte, int) {
-	dialer, err := proxy.SOCKS5("tcp", clientconfig.ProxyAddress+":"+strconv.Itoa(clientconfig.ProxyPort), nil, &net.Dialer{
+
+	dialer, err := proxy.SOCKS5("tcp", clientconfig.ProxyAddress+":"+strconv.Itoa(clientconfig.ProxyPort), clientconfig.Auth, &net.Dialer{
 		Timeout:   60 * time.Second,
 		KeepAlive: 30 * time.Second,
 	})
